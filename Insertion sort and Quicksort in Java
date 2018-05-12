@@ -1,0 +1,113 @@
+//
+//  SORTS. Demonstrate two sorting algorithms.
+//
+//    James Moen
+//    02 May 18
+//
+//  To run this program, type these commands.
+//
+//    javac Sorts.java
+//    java Sorts
+//
+
+class Sorts
+{
+
+//  INSERTION. Insertion sort.
+
+  public static void insertion(int [] array)
+  {
+    for (int count = 1; count < array.length; count += 1)
+    {
+      int element = array[count];
+      int index = count - 1;
+      while (index >= 0 && element < array[index])
+      {
+        array[index + 1] = array[index];
+        index -=1;
+      }
+      array[index + 1] = element;
+    }
+  }
+
+//  QUICKSORT. Quicksort. The 3-argument version does all the work.
+
+  public static void quicksort(int [] array)
+  {
+    if (array.length > 1)
+    {
+      quicksort(array, 0, array.length - 1);
+    }
+  }
+
+  private static void quicksort(int [] array, int leftEnd, int rightEnd)
+  {
+    int left = leftEnd;
+    int right = rightEnd;
+    int pivot = array[(leftEnd + rightEnd) / 2];
+    do
+    {
+      while (array[left] < pivot)
+      {
+        left += 1;
+      }
+      while (array[right] > pivot)
+      {
+        right -= 1;
+      }
+      if (left <= right)
+      {
+        swap(array, left, right);
+        left += 1;
+        right -= 1;
+      }
+    }
+    while (left <= right);
+    if (leftEnd < right)
+    {
+      quicksort(array, leftEnd, right);
+    }
+    if (left < rightEnd)
+    {
+      quicksort(array, left, rightEnd);
+    }
+  }
+
+//  SWAP. Exchange elements at indexes LEFT and RIGHT in ARRAY.
+
+  private static void swap(int [] array, int left, int right)
+  {
+    int temp = array[left];
+    array[left] = array[right];
+    array[right] = temp;
+  }
+
+//  WRITE ARRAY. Write ARRAY to standard output.
+
+  public static void writeArray(int [] array)
+  {
+    System.out.print('[');
+    for (int index = 0; index < array.length; index += 1)
+    {
+      System.out.print(' ');
+      System.out.print(array[index]);
+    }
+    System.out.println(" ]");
+  }
+
+//  MAIN. Main program. Call INSERTION and QUICKSORT on example arrays.
+
+  private static int [] array0 = { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+  private static int [] array1 = { 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 };
+
+  public static void main(String [] args)
+  {
+    writeArray(array0);  //  [ 9 8 7 6 5 4 3 2 1 0 ]
+    insertion(array0);
+    writeArray(array0);  //  [ 0 1 2 3 4 5 6 7 8 9 ]
+
+    writeArray(array1);  //  [ 9 8 7 6 5 4 3 2 1 0 ]
+    quicksort(array1);
+    writeArray(array1);  //  [ 0 1 2 3 4 5 6 7 8 9 ]
+  }
+}

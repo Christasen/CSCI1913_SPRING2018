@@ -1,0 +1,155 @@
+Programming Project 3 
+CSCI 1913: Introduction to Algorithms, 
+Data Structures, and Program Development 
+April 23, 2018
+
+0. Introduction.
+
+If we add key-value pairs to a binary search tree (BST) in random order, then the tree is likely to be approximately balanced. If it has n keys, then we can get a key’s value in about O(log n) key comparisons. However, if we add key-value pairs in order of their keys, then the tree will be degenerate. Now if it has n keys, then it takes O(n) key comparisons to get a key’s value, which is much slower. 
+      How can we design a BST that is fast, regardless of the order in which keys are added? In this programming project, you will implement a data structure called a hashed binary search tree (HBST) that may answer this question. An HBST is unlikely to be perfectly balanced, but is likely to be better balanced than a simple BST. 
+      The project uses many ideas from the last half of the course, including association lists, binary search trees, hashing, and head nodes. You will have seen Java code for almost all parts of the project by now, either in the lectures or on Moodle. Much of your work will involve finding relevant parts of this code and modifying them.
+
+1. Theory.
+
+Suppose that we give a key k to an HBST. We might want to get the value that’s associated with k, or we might want to associate k with an new value. In either case, instead of using k as the key directly, the HBST uses an integer h(k), where h is a high-quality hash function. In other words, each node in the HBST holds the integer hash of a key, not the key itself. We search the HBST using the integer hashes of the keys, not the keys themselves. 
+      There are at least two reasons why we might want to do that. First, suppose that we add a series of keys k₁, k₂ ..., kⱼ and their values to an HBST. Even when the keys are in increasing or decreasing order, their hashes h(k₁), h(k₂) ..., h(kⱼ) are likely to be in random order. As a result, if we use their hashes as keys, then we’re likely to obtain an approximately balanced tree. Second, searching the HBST involves comparing integers, not keys. Integers can be compared in O(1) time, which is usually faster than we can compare keys. 
+      However, one problem remains. Since we’re using a hash function h, we may get collisions: there may be keys k₁ ≠ k₂ for which h(k₁) = h(k₂), so the HBST will try to store the values for both keys in the same node. We can solve this problem by chaining, so that each node has an integer hash and an association list of key-value pairs. When we get the value associated with a key, or when we add a key-value pair, we obtain the association list from the node and search it. 
+      We can think of an HBST as being like a hash table that uses a BST instead of a bucket array. An array has strict limits on the integers that can be its indexes, but a BST has no such limits on the integers that can be its keys. The hash function h can therefore return a wide range of integers, but cause very few collisions. This means most of the HBST’s association lists will have only one node, so they can be searched in O(1) time.
+
+2. Implementation.
+
+You must write a Java class HBST that implements a hashed binary search tree, as described in the previous section. Its keys must be instances of the generic class Key, and its values must be instances of the generic class Value, so HBST looks like this. To simplify grading, your code must use the same names as are shown here.
+
+class HBST<Key, value>  
+{  
+  ⋮  
+}
+
+Your class HBST must have two inner classes. One inner class, called ValueNode, must implement the nodes of the association lists that handle collisions. Each ValueNode must have a Key slot called key, a Value slot called value, and a ValueNode slot called next. The other inner class, called TreeNode, must implement the nodes of the binary search tree. It must have an int slot called key, a ValueNode slot called value, and two TreeNode slots called left and right. Don’t try to use the same class for both kinds of nodes: that won’t work. 
+      Your class HBST must also have the following methods. Each method is worth a specific number of points. You may also write extra private helper methods, but they are worth zero points.
+
+public HBST()
+
+(5 points.) Constructor. Initialize a new empty HBST. Your HBST must have a head node (see below).
+
+public Value get(Key key)
+
+(15 points.) If no value is associated with key, then throw an IllegalArgumentException. Otherwise return the value that is associated with key. Note that key may be null, and the returned value may be null.
+
+private int hash(Key key)
+
+(5 points.) Return the hash value of key (see below). You may use any high quality hash function, such as the Java method hashCode, as part of this method. Note that key may be null.
+
+public int height()
+
+(5 points.) Return the height of the HBST. You will need it to show that your HBST works.
+
+public void put(Key key, Value value)
+
+(20 points.) Associate key with value. Note that key may be null, value may be null, or both may be null. You must use the head node (made by the constructor) to avoid the special case that occurs when the HBST is empty.
+
+As stated above, your constructor must make a head node, which must be used by put to avoid a special case when adding a new key-value pair to an empty HBST. The easiest way to do this is to have the key slot of the head node be some integer that cannot be returned by the method hash. This may affect how you write HBST’s constructor, and how you write its hash method.
+
+3. Example.
+
+The following driver class makes an instance of HBST and gives it some predefined Java names as keys, in strictly increasing alphabetical order. If an ordinary BST was used, then this would result in a degenerate tree, but that must not happen here!
+
+class HBSTifier  
+{   
+  private final static String[] keys =   
+   { "abstract",     "assert",       "boolean",     "break",  
+     "byte",         "case",         "catch",       "char",  
+     "class",        "const",        "continue",    "default",  
+     "do",           "double",       "else",        "extends",  
+     "false",        "final",        "finally",     "float",  
+     "for",          "goto",         "if",          "implements",  
+     "import",       "instanceof",   "int",         "interface",  
+     "long",         "native",       "new",         "null",  
+     "package",      "private",      "protected",   "public",  
+     "return",       "short",        "static",      "super",  
+     "switch",       "synchronized", "this",        "throw",  
+     "throws",       "transient",    "true",        "try",  
+     "var",          "void",         "volatile",    "while" };  
+       
+  public static void main(String [] args)  
+  {  
+    HBST<String, Integer> hbst = new HBST<String, Integer>();  
+  
+    for (int index = 0; index < keys.length; index += 1)  
+    {  
+      hbst.put(keys[index], index);  
+    }  
+       
+    System.out.println(hbst.height());  
+   
+    for (int index = 0; index < keys.length; index += 1)  
+    {  
+      System.out.format("%02d %s", hbst.get(keys[index]), keys[index]);  
+      System.out.println();  
+    }  
+  }  
+}
+
+Here’s the output from the main method. The first line shows the height of the HBST. The remaining lines show the integer associated with each key. Your output may be different, but still be correct, depending on how you write hash, etc.
+
+17  
+00 abstract  
+01 assert  
+02 boolean  
+03 break  
+04 byte  
+05 case  
+06 catch  
+07 char  
+08 class  
+09 const  
+10 continue  
+11 default  
+12 do  
+13 double  
+14 else  
+15 extends  
+16 false  
+17 final  
+18 finally  
+19 float  
+20 for  
+21 goto  
+22 if  
+23 implements  
+24 import  
+25 instanceof  
+26 int  
+27 interface  
+28 long  
+29 native  
+30 new  
+31 null  
+32 package  
+33 private  
+34 protected  
+35 public  
+36 return  
+37 short  
+38 static  
+39 super  
+40 switch  
+41 synchronized  
+42 this  
+43 throw  
+44 throws  
+45 transient  
+46 true  
+47 try  
+48 var  
+49 void  
+50 volatile  
+51 while
+
+There are 52 names in keys. A perfectly balanced BST with these names would have a height of about log₂(52), which is between 5 and 6. A degenerate BST would have a height of 52. The HBST has a height of 17—not as good as a balanced BST, but still much better than a degenerate BST. This is what we expected.
+
+4. Deliverables.
+
+Unlike the lab assignments, you are not allowed to work with a partner on this project. IT MUST BE DONE ENTIRELY BY YOURSELF ALONE! Although you can discuss the project in a general way with others, you are not allowed to get help from anyone except Prof. Moen or the course TA’s. 
+      You must turn in Java source code for the class HBST. You must also turn in code for a driver class that tests HBST, along with any output it produces. Write your driver class to do as many tests as are necessary to convince yourself (and the TA’s) that your code works. The driver class is worth zero points. Submit only one file, containing Java code for HBST, Java code for the driver class, and the output in comments. 
+      This is the last project for the course. It is due at 11:55 PM on Friday, May 4, 2018, the last day of class. Your lab TA’s can tell you how and where to turn it in.

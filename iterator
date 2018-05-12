@@ -1,0 +1,153 @@
+//  ITERATOR. Current Java defines ITERATOR in a different way. However this is
+//  consistent with the Weiss textbook.
+
+interface Iterator<Base>
+{
+  public boolean hasNext();
+  public Base next();
+  public void remove();
+}
+
+//  LINKED STACK. A linked traversable stack of BASEs.
+
+class LinkedStack<Base>
+{
+
+//  NODE. A node in a singly linked linear list.
+
+  private class Node
+  {
+    private Base value;  //  Object pushed on the stack.
+    private Node next;   //  Pointer to next NODE in the list.
+
+//  Constructor. Make a new NODE with VALUE and NEXT.
+
+    private Node(Base value, Node next)
+    {
+      this.value = value;
+      this.next = next;
+    }
+  }
+
+  private Node top;  //  Pointer to top NODE on the stack.
+
+//  Constructor. Make a new empty LINKED STACK.
+
+  public LinkedStack()
+  {
+    top = null;
+  }
+
+//  IS EMPTY. Test if the stack is empty.
+
+  public boolean isEmpty()
+  {
+    return top == null;
+  }
+
+//  PEEK. Return the VALUE at the TOP of the stack.
+
+  public Base peek()
+  {
+    if (isEmpty())
+    {
+      throw new IllegalStateException("Stack is empty.");
+    }
+    else
+    {
+      return top.value;
+    }
+  }
+
+//  POP. Delete the VALUE at the TOP of the stack.
+
+  public void pop()
+  {
+    if (isEmpty())
+    {
+      throw new IllegalStateException("Stack is empty.");
+    }
+    else
+    {
+      top = top.next;
+    }
+  }
+
+//  PUSH. Add a new VALUE to the TOP of the stack.
+
+  public void push(Base value)
+  {
+    top = new Node(value, top);
+  }
+
+//  STACK ITERATOR. Traverses this stack from TOP to bottom.
+
+  private class StackIterator implements Iterator<Base>
+  {
+    private Node where;  //  Currently visited NODE.
+
+//  Constructor. Make a new iterator positioned at the TOP of the stack.
+
+    private StackIterator()
+    {
+      where = top;
+    }
+
+//  HAS NEXT. Test if the iterator can deliver another VALUE.
+
+    public boolean hasNext()
+    {
+      return where != null;
+    }
+
+//  NEXT. Return the current VALUE from the iterator and advance to the next.
+
+    public Base next()
+    {
+      if (hasNext())
+      {
+        Base temp = where.value;
+        where = where.next;
+        return temp;
+      }
+      else
+      {
+        throw new IllegalStateException("Iterator is dead.");
+      }
+    }
+
+//  REMOVE. Do nothing. This is here just to satisfy the ITERATOR interface.
+
+    public void remove()
+    { }
+  }
+
+//  ITERATOR. Return a new STACK ITERATOR.
+
+  public Iterator<Base> iterator()
+  {
+    return new StackIterator();
+  }
+}
+
+//  THINGERATOR. Main program.
+
+class Thingerator
+{
+
+//  MAIN. Demonstrate how we can traverse a LINKED STACK with an ITERATOR.
+
+  public static void main(String [] args)
+  {
+    LinkedStack<String> s = new LinkedStack<String>();
+    s.push("C");
+    s.push("B");
+    s.push("A");
+
+    Iterator<String> i = s.iterator();
+    while (i.hasNext())
+    {
+      System.out.println(i.next());  //  A  B  C
+    }
+  }
+}

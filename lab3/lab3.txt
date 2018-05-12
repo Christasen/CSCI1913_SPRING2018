@@ -1,0 +1,96 @@
+Computer Laboratory 3 
+CSCI 1913: Introduction to Algorithms, 
+Data Structures, and Program Development 
+February 5–7, 2018
+
+0. Introduction.
+
+This assignment asks you to write a Python function that sorts a tuple of integers using the techniques of functional programming. This is the last Python lab for this course. We’re not done with Python yet: there is still a Python project yet to be assigned, and there will be questions about Python on future examinations.
+
+1. Theory.
+
+We say that a sequence of integers is sorted if it has elements e₀, e₁ ..., eⱼ₋₁ in that order, and also e₀ ≤ e₁ ... ≤ eⱼ₋₁. We can sort such a sequence S using the following algorithm.
+
+If S has no elements, then it is already sorted, so return S.
+
+Choose the largest element m from S. If m appears more than once in S, then choose any appearance of m.
+
+Make a new sequence that is like S, except that the first appearance of m is removed.
+
+Sort the new sequence by applying this algorithm recursively.
+
+Return the result of adding m to the end of the sorted sequence.
+
+For example, suppose that the algorithm is implemented by the Python function Sort, which takes a tuple of integers as its argument. We can trace the algorithm like this, where + is Python’s concatenation operator, and ⇒ means returns.
+
+Sort((1, 2, 3, 1))
+
+ ⇒  
+
+Sort((1, 2, 1)) + (3,)
+
+ 
+
+ ⇒  
+
+Sort((1, 1)) + (2,) + (3,)
+
+ 
+
+ ⇒  
+
+Sort((1)) + (1,) + (2,) + (3,)
+
+ 
+
+ ⇒  
+
+Sort(()) + (1,) + (1,) + (2,) + (3,)
+
+ 
+
+ ⇒  
+
+() + (1,) + (1,) + (2,) + (3,)
+
+ 
+
+ ⇒  
+
+(1, 1, 2, 3)
+
+Note that the algorithm does not use change the values of variables after they are assigned, and does not use mutable data structures. As a result, it can be implemented using the techniques of functional programming that were discussed in the lectures.
+
+2. Implementation.
+
+You must implement the sorting algorithm described in the previous section by defining the following Python functions. You must use the same names for the functions as are shown here, but you may use different parameter names if you like. Throughout, assume that T is a tuple of integers.
+
+Sort(T)
+
+Return a new tuple that is like T, except that its elements are sorted (see above). It works by calling Maximum and Remove somehow.
+
+Maximum(T)
+
+Assume that T has at least one element. Return the largest element from T, an integer. Hint: use a ‘‘helper’’ function.
+
+Remove(T, E)
+
+Return a new tuple that is like T, except that the first appearance of its element E is removed. If E does not appear in T, then Remove must return a tuple that is like T.
+
+Some of these functions may be written easily using higher-order functions such as lambda, filter, map, and reduce. However, I won’t tell you which ones can be written this way, or which higher-order functions you should use. 
+      All these functions must be written in a functional, recursive style, and your code must demonstrate that you know how to write in such a style. As a result, you will receive ZERO POINTS for this lab if your functions do any of the following things.
+
+Use one or more global variables.
+
+Use a loop, such as for or while.
+
+Assign a value to a variable more than once.
+
+Use mutable data structures, such as lists or dictionaries.
+
+Also, you must not use predefined functions that do things you are asked to write yourself—so you must not call a predefined sort function. If you write additional ‘‘helper’’ functions, then they must not do these things either.
+
+3. Tests.
+
+The file tests.py on Moodle contains a series of tests. Each test calls a function from your program, then prints what the function returns. Each test also has a comment that says what it should print, and how many points it is worth. 
+      To grade your work, the TA’s will run the tests using your functions. If a test prints exactly what it should, without error, then you will receive all the points for that test. However, if a test does anything else, then you will receive no points for that test. Your score for this lab is the sum of points you receive for all the tests.
